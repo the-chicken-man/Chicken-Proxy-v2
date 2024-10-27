@@ -9,7 +9,6 @@ export type WorkerMessage = {
     };
     websocket?: {
         url: string;
-        origin: string;
         protocols: string[];
         requestHeaders: BareHeaders;
         channel: MessagePort;
@@ -37,7 +36,7 @@ export declare class WorkerConnection {
     channel: BroadcastChannel;
     port: MessagePort | Promise<MessagePort>;
     workerPath: string;
-    constructor(worker?: string | MessagePort);
+    constructor(worker?: string | Promise<MessagePort> | MessagePort);
     createChannel(workerPath?: string, inInit?: boolean): void;
     sendMessage(message: WorkerMessage, transferable?: Transferable[]): Promise<WorkerResponse>;
 }
