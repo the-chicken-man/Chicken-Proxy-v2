@@ -1,7 +1,6 @@
 (async () => {
 const demoMode = true;
 const rammerheadEnabled = false;
-const meteorEnabled = false;
 const scramjetEnabled = false;
 const uvEnabled = true;
 const defaultService = "uv";
@@ -238,20 +237,7 @@ async function encodeService(url, service) {
       break;
     case "scramjet":
       if (scramjetEnabled) {
-        return (
-          window.location.origin +
-          __scramjet$config.prefix +
-          __scramjet$config.codec.encode(url)
-        );
-      }
-      break;
-    case "meteor":
-      if (meteorEnabled) {
-        return (
-          window.location.origin +
-          $meteor_config.prefix +
-          $meteor_config.codec.encode(url)
-        );
+        return window.location.origin + chemical.scramjet.encodeUrl(url);
       }
       break;
   }
@@ -318,14 +304,7 @@ window.chemical.decode = async function (url, config) {
       break;
     case "scramjet":
       if (scramjetEnabled) {
-        return __scramjet$config.codec.decode(
-          url.split(__scramjet$config.prefix)[1]
-        );
-      }
-      break;
-    case "meteor":
-      if (meteorEnabled) {
-        return $meteor_config.codec.decode(url.split($meteor_config.prefix)[1]);
+        return $scramjet.codec.decode(url.split($scramjet.config.prefix)[1]);
       }
       break;
   }
@@ -469,12 +448,19 @@ if (uvEnabled) {
   await loadScript("/uv/uv.config.js");
 }
 if (scramjetEnabled) {
-  await loadScript("/scramjet/scramjet.codecs.js");
-  await loadScript("/scramjet/scramjet.config.js");
-}
-if (meteorEnabled) {
-  await loadScript("/meteor/meteor.codecs.js");
-  await loadScript("/meteor/meteor.config.js");
+  await loadScript("/scramjet/scramjet.shared.js");
+  await loadScript("/scramjet/scramjet.controller.js");
+  chemical.scramjet = new ScramjetController({
+    prefix: "/~/scramjet/",
+    files: {
+      wasm: "/scramjet/scramjet.wasm.js",
+      worker: "/scramjet/scramjet.worker.js",
+      client: "/scramjetetscramjet.client.js",
+      shared: "/scramjetetscramjet.shared.js",
+      sync: "/scramjet/scramjet.sync.js",
+    },
+  });
+  chemical.scramjet.init("/chemical.sw.js");
 }
 window.chemical.connection = new window.BareMux.BareMuxConnection(
   "/baremux/worker.js"
